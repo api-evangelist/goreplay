@@ -1,0 +1,34 @@
+aid: goreplay
+name: GoReplay
+description: >-
+  GoReplay is an open source network traffic capture and replay tool for testing APIs with real production traffic.
+type: Index
+image: https://kinlane-productions.s3.amazonaws.com/apis-json/apis-json-logo.jpg
+tags:
+  - API Analysis
+  - Traffic Replay
+url: >-
+  https://raw.githubusercontent.com/api-evangelist/goreplay/refs/heads/main/apis.yml
+created: '2026-03-26'
+modified: '2026-03-26'
+specificationVersion: '0.19'
+apis:
+  - aid: goreplay:goreplay
+    name: GoReplay
+    description: >-
+      GoReplay is an open source network traffic capture and replay tool for testing APIs with real production traffic.
+    humanURL: https://goreplay.org
+    tags:
+      - API Analysis
+      - Traffic Replay
+    properties:
+      - type: Documentation
+        url: https://goreplay.org/docs
+      - type: GitHubOrg
+        url: https://github.com/buger/goreplay
+common:
+  - type: Website
+    url: https://goreplay.org
+maintainers:
+  - FN: Kin Lane
+    email: kin@apievangelist.com
