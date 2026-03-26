@@ -1,34 +1,56 @@
 aid: goreplay
 name: GoReplay
 description: >-
-  GoReplay is an open source network traffic capture and replay tool for testing APIs with real production traffic.
+  GoReplay is an open source network traffic capture and replay tool that allows
+  teams to record live HTTP traffic and replay it in test environments, enabling
+  realistic load testing and API testing with real production data.
 type: Index
 image: https://kinlane-productions.s3.amazonaws.com/apis-json/apis-json-logo.jpg
 tags:
-  - API Analysis
   - Traffic Replay
+  - Load Testing
+  - Open Source
+  - HTTP Traffic
+  - API Testing
+  - Network Capture
 url: >-
   https://raw.githubusercontent.com/api-evangelist/goreplay/refs/heads/main/apis.yml
 created: '2026-03-26'
 modified: '2026-03-26'
 specificationVersion: '0.19'
 apis:
-  - aid: goreplay:goreplay
+  - aid: goreplay:goreplay-tool
     name: GoReplay
     description: >-
-      GoReplay is an open source network traffic capture and replay tool for testing APIs with real production traffic.
+      GoReplay captures and replays live HTTP traffic, enabling developers to
+      test APIs and applications with real production traffic patterns without
+      impacting production systems.
     humanURL: https://goreplay.org
-    tags:
-      - API Analysis
-      - Traffic Replay
     properties:
       - type: Documentation
-        url: https://goreplay.org/docs
+        url: https://github.com/buger/goreplay/wiki
+      - type: GettingStarted
+        url: https://github.com/buger/goreplay/wiki/Getting-Started
       - type: GitHubOrg
         url: https://github.com/buger/goreplay
+    tags:
+      - Traffic Replay
+      - Load Testing
+      - Open Source
+      - API Testing
 common:
   - type: Website
     url: https://goreplay.org
+  - type: Documentation
+    url: https://github.com/buger/goreplay/wiki
+  - type: GitHub
+    url: https://github.com/buger/goreplay
+  - type: GettingStarted
+    url: https://github.com/buger/goreplay/wiki/Getting-Started
+  - type: Pricing
+    url: https://goreplay.org/pro.html
+  - type: Support
+    url: https://github.com/buger/goreplay/issues
 maintainers:
   - FN: Kin Lane
     email: kin@apievangelist.com
