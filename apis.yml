@@ -7,12 +7,12 @@ description: >-
 type: Index
 image: https://kinlane-productions.s3.amazonaws.com/apis-json/apis-json-logo.jpg
 tags:
-  - Traffic Replay
-  - Load Testing
-  - Open Source
-  - HTTP Traffic
   - API Testing
+  - HTTP Traffic
+  - Load Testing
   - Network Capture
+  - Open Source
+  - Traffic Replay
 url: >-
   https://raw.githubusercontent.com/api-evangelist/goreplay/refs/heads/main/apis.yml
 created: '2026-03-26'
@@ -34,10 +34,10 @@ apis:
       - type: GitHubOrg
         url: https://github.com/buger/goreplay
     tags:
-      - Traffic Replay
+      - API Testing
       - Load Testing
       - Open Source
-      - API Testing
+      - Traffic Replay
 common:
   - type: Website
     url: https://goreplay.org
