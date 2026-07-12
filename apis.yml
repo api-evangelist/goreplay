@@ -38,6 +38,8 @@ apis:
       - Open Source
       - Traffic Replay
 common:
+  - type: DomainSecurity
+    url: security/goreplay-domain-security.yml
   - type: Website
     url: https://goreplay.org
   - type: Documentation
