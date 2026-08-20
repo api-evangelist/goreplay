@@ -23,6 +23,13 @@ tags:
   - HTTP Traffic
   - Load Testing
   - Network Capture
+  - Open-Source
+  - Traffic Replay
+tags_raw:
+  - API Testing
+  - HTTP Traffic
+  - Load Testing
+  - Network Capture
   - Open Source
   - Traffic Replay
 url: https://raw.githubusercontent.com/api-evangelist/goreplay/refs/heads/main/apis.yml
@@ -45,6 +52,11 @@ apis:
       - type: GitHubOrg
         url: https://github.com/buger/goreplay
     tags:
+      - API Testing
+      - Load Testing
+      - Open-Source
+      - Traffic Replay
+    tags_raw:
       - API Testing
       - Load Testing
       - Open Source
