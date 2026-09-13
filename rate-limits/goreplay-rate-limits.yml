@@ -3,11 +3,20 @@ specificationVersion: '0.1'
 schema: https://raw.githubusercontent.com/api-evangelist/interface-research/main/schema/api-commons.yml#/$defs/RateLimits
 provider: GoReplay
 providerId: goreplay
+generated: '2026-09-13'
+method: searched
+source: >-
+  https://goreplay.org/pro/, https://goreplay.org/docs/ (replaying, filtering,
+  troubleshooting) and the flag table in
+  https://raw.githubusercontent.com/probelabs/goreplay/master/settings.go
 created: '2026-05-04'
-# Provenance stamped 2026-08-11: this artifact was written by the API Evangelist
-# bulk sweep dated 2026-05-04, not harvested from the provider. See roadmap#35.
-method: generated
-modified: '2026-05-04'
+modified: '2026-09-13'
+supersedes: >-
+  REPLACES a bulk-sweep scaffold dated 2026-05-04 (roadmap#35) that declared
+  X-RateLimit-Limit / X-RateLimit-Remaining / X-RateLimit-Reset response headers, 429
+  and 503 status codes, and free/professional/enterprise per-minute quotas. GoReplay
+  serves no HTTP endpoint, returns no headers and enforces no quota, so every one of
+  those values was fictional. Discarded in full.
 tags:
   - API Testing
   - HTTP Traffic
@@ -15,79 +24,70 @@ tags:
   - Network Capture
   - Open Source
   - Traffic Replay
-  - Rate Limiting
-  - Quotas
-  - Throttling
-description: Machine-readable rate limit definitions for the GoReplay API surface. Captures per-tier quotas,
-  burst behavior, response signaling, and recovery semantics. Defaults are scaffold values to be replaced
-  with published provider limits.
-headers:
-  limit: X-RateLimit-Limit
-  remaining: X-RateLimit-Remaining
-  reset: X-RateLimit-Reset
-  retryAfter: Retry-After
-  policy: RateLimit-Policy
-responseCodes:
-  throttled: 429
-  quotaExceeded: 429
-  serviceUnavailable: 503
-limits:
-  - tier: free
-    name: Free Tier Default
-    scope: api-key
-    metric: requests_per_minute
-    limit: 10
-    burst: 20
-    timeFrame: minute
-    applies:
-      - GoReplay
-  - tier: free
-    name: Free Tier Monthly Quota
-    scope: api-key
-    metric: requests_per_month
-    limit: 1000
-    timeFrame: month
-    applies:
-      - GoReplay
-  - tier: professional
-    name: Professional Tier Default
-    scope: api-key
-    metric: requests_per_minute
-    limit: 100
-    burst: 200
-    timeFrame: minute
-    applies:
-      - GoReplay
-  - tier: professional
-    name: Professional Tier Monthly Quota
-    scope: api-key
-    metric: requests_per_month
-    limit: 100000
-    timeFrame: month
-    applies:
-      - GoReplay
-  - tier: enterprise
-    name: Enterprise Negotiated Limit
-    scope: contract
-    metric: requests_per_minute
-    limit: 1000
-    burst: 5000
-    timeFrame: minute
-    applies:
-      - GoReplay
-policies:
-  - name: Backoff Strategy
-    description: Clients should implement exponential backoff with jitter, honoring the Retry-After header
-      when present.
-  - name: Burst Handling
-    description: Short bursts above the steady-state limit are tolerated up to the documented burst ceiling
-      before throttling engages.
-  - name: Quota Reset
-    description: Monthly quotas reset at the start of each calendar month in UTC. Per-minute and per-second
-      windows reset on a sliding-window basis.
-  - name: Fair Use
-    description: Even on uncapped enterprise tiers, sustained usage that materially impacts shared infrastructure
-      may be subject to fair-use throttling.
+description: >-
+  GoReplay publishes no API rate limits because it publishes no API. The `gor` binary
+  runs on the customer's own hosts and never calls a GoReplay-operated endpoint, so
+  there is no vendor-side quota, no throttling response and no rate-limit header to
+  read. Recorded as an honest zero. What GoReplay does ship is the mirror image —
+  OUTBOUND throttling controls the operator uses to protect their own replay target —
+  captured below under `outbound_controls` so the distinction is not lost.
+limit_count: 0
+limits: []
+headers: {}
+responseCodes: {}
+note: >-
+  limit_count is 0 because the provider documents no inbound limits, not because the
+  docs were unreachable. goreplay.org/docs/ returned 200 across all twenty pages
+  probed on 2026-09-13 and none describes a vendor quota.
+evidence:
+  - url: https://goreplay.org/pro/
+    status: 200
+    finding: >-
+      Pricing is a flat $2,950/year licence with no usage dimension — no request
+      quota, no overage, no metering.
+  - url: https://goreplay.org/docs/
+    status: 200
+    finding: >-
+      The documentation set describes inputs, outputs, filtering, rewriting,
+      middleware and operations. No endpoint, no authentication against a GoReplay
+      service, no limits.
+  - url: https://goreplay.org/llms.txt
+    status: 200
+    finding: >-
+      The provider's own machine-readable summary lists only CLI commands and doc
+      pages; it names no API host.
+outbound_controls:
+  description: >-
+    GoReplay throttles what it EMITS toward a replay target the operator owns. These
+    are product features, not vendor-imposed limits, and must not be read as
+    rate limits in the scoring sense.
+  controls:
+    - name: replay speed modifier
+      syntax: --input-file "requests.gor|200%"
+      description: >-
+        Scale replay rate as a percentage of the originally captured rate. 200%
+        replays at twice production speed; values below 100% slow it down.
+      docs: https://goreplay.org/docs/load-testing/
+    - name: --http-header-limiter
+      description: Deterministic percentage sampling keyed on a header value.
+      docs: https://goreplay.org/docs/filtering/
+    - name: --http-param-limiter
+      description: Deterministic percentage sampling keyed on a URL parameter value.
+      docs: https://goreplay.org/docs/filtering/
+    - name: --output-http-workers / --output-http-workers-min
+      description: Replay concurrency ceiling and floor.
+      docs: https://goreplay.org/docs/troubleshooting/
+    - name: --output-http-queue-len
+      description: Output queue depth; the documented response to queue backups.
+      docs: https://goreplay.org/docs/troubleshooting/
+    - name: --output-http-timeout / --output-http-worker-timeout
+      description: Per-request and per-worker replay timeouts.
+    - name: --input-raw-buffer-size
+      description: >-
+        Kernel capture buffer. Not a rate control, but the documented cause of
+        dropped packets that present as truncated HTTP under load.
+      docs: https://goreplay.org/docs/troubleshooting/
+policies: []
 maintainers:
   - FN: Kin Lane
     email: kin@apievangelist.com

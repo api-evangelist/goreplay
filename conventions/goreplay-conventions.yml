@@ -1,0 +1,235 @@
+generated: '2026-09-13'
+method: searched
+source: >-
+  https://goreplay.org/docs/middleware/, /docs/files/, /docs/replaying/,
+  /docs/capturing/, /docs/filtering/, /docs/rewriting/, /docs/distributed/,
+  /docs/pro/, /docs/troubleshooting/, /docs/faq/ — cross-checked against
+  https://raw.githubusercontent.com/probelabs/goreplay/master/settings.go
+provider: GoReplay
+providerId: goreplay
+scope: >-
+  GoReplay publishes NO HTTP API. This file therefore documents the cross-cutting
+  semantics of the interfaces it does publish: the `gor` command line, the
+  middleware STDIN/STDOUT wire protocol, and the .gor capture file format. Fields
+  that only make sense for a hosted REST API are recorded as `na` with the reason,
+  rather than left blank or invented.
+interfaces:
+  - name: cli
+    kind: command-line
+    contract: cli/goreplay-cli.yml
+    stability: >-
+      Unversioned and not compatibility-guaranteed. Flags have been removed without
+      notice (--output-http-stats, --input-http), which the docs record after the fact.
+  - name: middleware-protocol
+    kind: stdio wire protocol
+    docs: https://goreplay.org/docs/middleware/
+    stability: Documented, unversioned, no negotiation step.
+  - name: gor-file
+    kind: capture file format
+    docs: https://goreplay.org/docs/files/
+    stability: Unversioned binary/text hybrid; consumed by --input-file.
+auth:
+  style: na
+  reason: >-
+    There is no GoReplay service to authenticate against. Credentials appear only as
+    pass-through configuration for third-party sinks the operator chooses: AWS
+    environment variables for PRO S3 storage (AWS_ACCESS_KEY_ID / AWS_ACCESS_KEY,
+    AWS_SECRET_ACCESS_KEY / AWS_SECRET_KEY, AWS_REGION / AWS_DEFAULT_REGION,
+    AWS_ENDPOINT_URL, AWS_SESSION_TOKEN, AWS_SDK_LOAD_CONFIG), Kafka SASL
+    (--input-kafka-use-sasl / --input-kafka-username / --input-kafka-password and the
+    matching output flags), and TLS material for TCP transport
+    (--input-tcp-certificate, --input-tcp-certificate-key, --kafka-tls-ca-cert,
+    --kafka-tls-client-cert, --kafka-tls-client-key).
+  commercial_licence: >-
+    GoReplay PRO is unlocked by a "Source URL" issued at purchase, per the EULA at
+    https://github.com/probelabs/goreplay/blob/master/COMM-LICENSE — a licensing
+    mechanism, not an API credential.
+message_protocol:
+  name: GoReplay middleware protocol
+  docs: https://goreplay.org/docs/middleware/
+  transport: >-
+    The middleware program is spawned by gor and reads messages from STDIN, writing
+    modified messages to STDOUT.
+  framing: >-
+    One message per line, hex-encoded. The decoded payload is a meta header, a
+    newline, then the raw HTTP body.
+  meta_header:
+    fields:
+      - name: type
+        values:
+          '1': request
+          '2': origin response
+          '3': replayed response
+      - name: request_id
+        note: >-
+          The correlation key. Communication is ASYNCHRONOUS — request, origin
+          response and replayed response can arrive in any order — so a middleware
+          MUST key its state on the request id rather than assume ordering.
+      - name: timestamp
+      - name: latency
+        note: present on response messages only
+  rules:
+    - Emit the message back hex-encoded, preserving the original meta header.
+    - Writing nothing for a message drops that message from the pipeline.
+    - If you receive responses you must emit them too, even unchanged.
+  visibility_gates:
+    - Origin responses (type 2) reach middleware only when --input-raw-track-response is set.
+    - Replayed responses (type 3) reach middleware only when --output-http-track-response is set.
+  examples: https://github.com/probelabs/goreplay/tree/master/examples/middleware
+  alternate: >-
+    --js-middleware runs JavaScript under goja and is distinct from --middleware. It
+    is documented on the middleware page but no such flag registration was found in
+    settings.go on master as of 2026-09-13 — see cli/goreplay-cli.yml.
+pagination:
+  style: na
+  reason: No request/response API. Capture files are streamed sequentially by --input-file.
+filtering:
+  style: regex predicates applied in-pipeline
+  params:
+    - --http-allow-url / --http-disallow-url
+    - --http-allow-header / --http-disallow-header
+    - --http-allow-method
+    - --http-basic-auth-filter
+  sampling:
+    - --http-header-limiter
+    - --http-param-limiter
+    - "input/output speed modifiers: --input-file 'file.gor|200%' scales replay rate"
+  note: >-
+    Filtering is a DROP semantics pipeline: a request that fails an allow predicate
+    never reaches the output. This is the primary safety control for keeping
+    production traffic out of a test target.
+field_expansion:
+  supported: false
+  reason: na — no resource representations.
+metadata:
+  supported: true
+  mechanism: >-
+    --http-set-header and --http-set-param inject arbitrary metadata into replayed
+    requests; the docs' own example tags replayed traffic with
+    'User-Agent: Gor' so the target can distinguish it from live traffic.
+request_id_tracing:
+  supported: true
+  mechanism: >-
+    The middleware meta header carries a request id that correlates the captured
+    request with its origin response and its replayed response. This is GoReplay's
+    equivalent of a trace id and is the documented way to build correctness
+    comparisons between origin and replay.
+  header: null
+  note: >-
+    The id lives in the middleware wire protocol, not in an HTTP header on the
+    replayed request. --input-raw-realip-header lets the operator name a header the
+    real client IP is read from.
+versioning:
+  style: release tags on the binary
+  detail: see lifecycle/goreplay-lifecycle.yml
+  runtime_negotiation: false
+error_envelope:
+  style: na
+  reason: >-
+    No API and no published error-code registry. Failures surface as process log
+    output and the docs handle them narratively on
+    https://goreplay.org/docs/troubleshooting/ (empty capture, dropped packets and
+    truncated HTTP, queue backups, a CGO getaddrinfo DNS crash, "too many open
+    files"). Because there is no enumerated, stable error identifier set, no
+    errors/ artifact was written rather than inventing one.
+rate_limit_signaling:
+  inbound: na
+  reason: >-
+    GoReplay exposes no endpoint and therefore returns no rate-limit headers. See
+    rate-limits/goreplay-rate-limits.yml.
+  outbound_throttling:
+    supported: true
+    note: >-
+      The tool throttles what it EMITS, not what it accepts: percentage/absolute
+      speed modifiers on inputs and outputs, --http-header-limiter and
+      --http-param-limiter for deterministic sampling, and --output-http-workers /
+      --output-http-queue-len for replay concurrency. These protect the replay
+      target, which is the operator's own system.
+idempotency:
+  supported: false
+  coverage: none
+  mechanism: null
+  header: null
+  scope: []
+  retention: null
+  note: >-
+    GoReplay ships no replay-protection mechanism, and this is inherent to the
+    product rather than an oversight: its entire purpose is to re-send requests that
+    already happened. Running the same capture file against the same target twice
+    executes every mutating request twice. No idempotency key is generated,
+    propagated or honoured; --http-set-header would let an operator inject one by
+    hand, but nothing in GoReplay produces or de-duplicates on it. The documented
+    mitigation is environmental, not protocol-level: replay into an isolated target,
+    and use the filtering flags to exclude mutating routes.
+  evidence: https://goreplay.org/docs/replaying/
+dry_run_mode:
+  supported: true
+  grade: documented
+  mechanisms:
+    - flag: --input-file-dry-run
+      note: Read a capture file without replaying it — a true rehearsal of the input stage.
+    - flag: --output-null
+      note: Run the full capture pipeline and discard every message, producing no side effect on any target.
+    - flag: --output-stdout
+      note: >-
+        Print what WOULD be replayed instead of sending it. The installation and
+        troubleshooting pages both use this as the first-run verification step.
+    - flag: --exit-after
+      note: Bounds a rehearsal run to a fixed duration.
+  note: >-
+    Rehearsal is well served. An operator can see exactly what a pipeline would emit
+    before pointing it at a target, and the docs lead with that workflow.
+reversibility:
+  grade: none
+  applicable: true
+  applicable_note: >-
+    NOT `na`. GoReplay has no write API, but it has a consequential write ACTION:
+    --output-http re-executes real HTTP requests, including POST/PUT/PATCH/DELETE,
+    against whatever target is named. That is the most dangerous thing this tool
+    does and reversibility is exactly the question an operator or an agent should ask
+    before running it.
+  reversal_operations: []
+  window: null
+  note: >-
+    There is no undo. Once a request is emitted by --output-http it has been
+    delivered; GoReplay records no transaction log of what it replayed, offers no
+    compensating action, and has no cancel, rollback or revert path. Nothing in the
+    provider's documentation states a window, so none is asserted here.
+  documented_mitigations:
+    - >-
+      Rehearse first with --input-file-dry-run, --output-null or --output-stdout
+      before naming a real target.
+    - >-
+      Restrict the replayed surface with --http-allow-method (e.g. GET and OPTIONS
+      only) and --http-allow-url / --http-disallow-url so mutating routes never leave
+      the pipeline.
+    - >-
+      Replay only into an isolated environment. The PRO page states the requirement
+      directly: "Both editions need a suitable capture point and an isolated replay
+      target."
+    - >-
+      Strip or rewrite credentials and session state for the target with
+      --http-rewrite-header, --http-set-header, --http-set-param and --http-rewrite-url,
+      or in middleware, so replayed traffic cannot act as a real production user.
+  evidence:
+    - https://goreplay.org/docs/replaying/
+    - https://goreplay.org/pro/
+    - https://goreplay.org/docs/filtering/
+safety_notes:
+  - >-
+    The provider's own contact form warns "Please leave out credentials and
+    production request data", which is consistent with the middleware page framing
+    token handling and PII scrubbing as the operator's responsibility.
+  - >-
+    Capture requires root or CAP_NET_RAW. The docs recommend setcap plus a dedicated
+    group rather than running gor as root.
+  - >-
+    GoReplay does not decrypt TLS. HTTPS capture only works after TLS termination,
+    which means the captured stream is plaintext and must be handled accordingly.
+cross_references:
+  cli: cli/goreplay-cli.yml
+  lifecycle: lifecycle/goreplay-lifecycle.yml
+  rate_limits: rate-limits/goreplay-rate-limits.yml
+  plans: plans/goreplay-plans-pricing.yml
+  conformance: conformance/goreplay-conformance.yml
+  packages: packages/goreplay-packages.yml

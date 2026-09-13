@@ -1,0 +1,128 @@
+generated: '2026-09-13'
+method: searched
+source: https://api.github.com/repos/probelabs/goreplay/releases — the GitHub Releases feed for https://github.com/probelabs/goreplay/releases,
+  which is the release channel the provider links from goreplay.org
+provider: GoReplay
+providerId: goreplay
+description: GoReplay publishes no dated changelog page on goreplay.org — https://goreplay.org/changelog/
+  returns 404 and the site sitemap lists no changelog URL. GitHub Releases is the provider's only dated,
+  structured record of change, and the site links it directly from the homepage ("GitHub releases"). Entries
+  below are transcribed verbatim-in-substance from that feed; URLs inside release bodies were stripped
+  for brevity and the canonical release URL is carried per entry.
+scheme: semver
+scheme_note: Tags are semver but inconsistently prefixed — most carry a leading v (v1.3.2), the latest
+  stable does not (1.3.3), and the 1.3.0 release candidates used an underscore form (v1.3.0_RC11). An
+  automated consumer cannot sort these lexically.
+current_version: 1.3.3
+current_version_date: '2021-10-06'
+latest_prerelease: v2.0.0-rc2
+latest_prerelease_date: '2022-02-07'
+unreleased_version: v2.0.0
+cadence: none — see staleness
+staleness: 'The last STABLE release is 1.3.3, published 2021-10-06, nearly five years before this pass.
+  The last tag of any kind is the v2.0.0-rc2 prerelease of 2022-02-07. The master branch nonetheless reports
+  itself as v2.0.0 and was pushed 2026-01-27, so development continues while distribution does not: a
+  consumer installing via Homebrew, the Go proxy or the release tarballs gets 2021 code. The repository
+  also changed hands in this window — github.com/buger/goreplay now redirects to github.com/probelabs/goreplay
+  — without a release marking the move.'
+breaking_changes_policy: null
+breaking_changes_policy_note: No published policy. Breaking changes are described inside individual release
+  bodies (v1.3.0 rebuilt the capture engine) but there is no stated compatibility or deprecation commitment.
+entries:
+- version: v2.0.0-rc2
+  date: '2022-02-07'
+  prerelease: true
+  url: https://github.com/probelabs/goreplay/releases/tag/v2.0.0-rc2
+  highlights: TBD
+- version: v2.0.0-rc1
+  date: '2022-02-07'
+  prerelease: true
+  url: https://github.com/probelabs/goreplay/releases/tag/v2.0.0-rc1
+  highlights: TBD
+- version: 1.3.3
+  date: '2021-10-06'
+  prerelease: false
+  url: https://github.com/probelabs/goreplay/releases/tag/1.3.3
+  highlights: '## What''s Changed - Various improvements for packet capture, especially for POST requests
+    - Fixed replay of pcap files - Fixed replay of files with malformed records **Full Changelog**:'
+- version: v1.3.2
+  date: '2021-08-19'
+  prerelease: false
+  url: https://github.com/probelabs/goreplay/releases/tag/v1.3.2
+  highlights: 'Fix promiscuous mode - if enabled no need to filter on host as we want to capture traffic
+    not related to this host #994 - Fix `--input-raw-realip-header` - Fixed false positive network interface
+    lookups Thanks @DimaGolomozy!'
+- version: v1.3.1
+  date: '2021-08-12'
+  prerelease: false
+  url: https://github.com/probelabs/goreplay/releases/tag/v1.3.1
+  highlights: 'Fix duplicated requests on Linux #989 - Improve packet capture, to make packet processing
+    multithreaded 11d61dcb4d518f7ba33ae6f3817a279cee36398d'
+- version: v1.3.0
+  date: '2021-08-06'
+  prerelease: false
+  url: https://github.com/probelabs/goreplay/releases/tag/v1.3.0
+  highlights: '# Highlights Added official Windows support Traffic capture engine fully re-constructed
+    to be more scalable, efficient and bulletproof. You should see way lower packet loss, capture quality,
+    and CPU/Memory usage. Deprecated own HTTP client in favour of native Go HTTP library Increased stability,
+    and numerous bug fixes. # Features - Added way to capture traffic from multipe ports with single input '
+- version: v1.3.0_RC11
+  date: '2021-08-03'
+  prerelease: true
+  url: https://github.com/probelabs/goreplay/releases/tag/v1.3.0_RC11
+  highlights: 'Fix loopback interface issue on windows - Fix buffer index number for sticky tcp output
+    connection @DimaGolomozy - Fix output file size limits @lins05 - Fixed usage of `--input-raw-bpf-filter`
+    - Fix BPF filter when listen on all interfaces - Optimize packet capture thread to reduce context
+    switching - Added new debugging endpoint when `--http-pprof` enabled: /debug/vars - Added `--input-file-dry-r'
+- version: v1.3.0_RC6
+  date: '2021-06-30'
+  prerelease: true
+  url: https://github.com/probelabs/goreplay/releases/tag/v1.3.0_RC6
+  highlights: Significantly improved CPU and Memory usage. - Added `af_packet` packet capture engine for
+    Linux - Skip incomplete or malformed messages from output (can be enabled back by setting --input-raw-allow-incomplete)
+- version: v1.3.0_RC5
+  date: '2021-06-10'
+  prerelease: true
+  url: https://github.com/probelabs/goreplay/releases/tag/v1.3.0_RC5
+  highlights: 'Added a way to capture multiple ports using one input like this: `--input-raw :80,8080,3000`
+    #935 - Fixed usage of "localhost" hostname when trying to limit scope of packet capture (e.g. `--input-raw
+    localhost:80`), now it properly binds to loopback interface #943 - Fixed detection of windows network
+    interfaces #943 - Fixed Makefile job to generate windows binaries - Fixed big memory allocation is'
+- version: v1.3.0_RC4
+  date: '2021-06-09'
+  prerelease: true
+  url: https://github.com/probelabs/goreplay/releases/tag/v1.3.0_RC4
+  highlights: '# Changes from previous RC - Big changes in capture engine to give more performance and
+    stability #916 - Fixed a bug when GoRepay were including outgoing HTTP request initialized within
+    the app, and having the same port #941 - Added (again) windows support #940 - Fix Output HTTP connection
+    leak #927'
+- version: v1.3.0_RC1
+  date: '2021-01-15'
+  prerelease: true
+  url: https://github.com/probelabs/goreplay/releases/tag/v1.3.0_RC1
+  highlights: null
+- version: v1.2.0
+  date: '2020-09-17'
+  prerelease: false
+  url: https://github.com/probelabs/goreplay/releases/tag/v1.2.0
+  highlights: 'Engine CPU consumption reduced by 60% - Implemented M''mapped AF_PACKET for Linux. To enable
+    set `--input-raw-engine af_packet`. #807 - Added Kafka TLS configuration flag #800 - Fix wrong param
+    value updated while `--http-set-param` #791 - The engine can now capture more requests with large
+    payload #797 - Created TCP package #97 - Fixed minor bugs in HTTP proto parser'
+- version: v1.1.0
+  date: '2020-07-04'
+  prerelease: false
+  url: https://github.com/probelabs/goreplay/releases/tag/v1.1.0
+  highlights: 'Fix usage of multiple `--input-raw` plugins, e.g. `--input-raw :80 --input-raw :81 --input-raw
+    :82` - Allow to set byte size limits in human friedly format: `--output-file-size-limit`, `--output-file-max-size-limit`,
+    `--copy-buffer-size` and `--input-raw-buffer-size` can now parse inputs from differents bases and
+    data units like: 10mb, 10kb, 100gb, 18t - Fix calculation of the output file size whe'
+- version: v1.0.0
+  date: '2019-03-30'
+  prerelease: false
+  url: https://github.com/probelabs/goreplay/releases/tag/v1.0.0
+  highlights: '## Long awaited major release of GoReplay! - Added option to specify custom BPF filter
+    (e.g. tcpdump syntax). Can be useful in case of non standard network interfaces like tunneling or
+    SPAN port. Example: `--input-raw-bpf-filter ''dst port 80’` - Support for reading directly from pcap
+    file, using `--input-raw-engine pcap_file --input-raw ./recording.pcap`_ - Added official Docker image
+    `docker pull'

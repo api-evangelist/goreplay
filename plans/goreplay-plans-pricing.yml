@@ -3,11 +3,18 @@ specificationVersion: '0.1'
 schema: https://raw.githubusercontent.com/api-evangelist/interface-research/main/schema/api-commons.yml#/$defs/Plans
 provider: GoReplay
 providerId: goreplay
+generated: '2026-09-13'
+method: searched
+source: https://goreplay.org/pro/
 created: '2026-05-04'
-# Provenance stamped 2026-08-11: this artifact was written by the API Evangelist
-# bulk sweep dated 2026-05-04, not harvested from the provider. See roadmap#35.
-method: generated
-modified: '2026-05-04'
+modified: '2026-09-13'
+supersedes: >-
+  REPLACES a bulk-sweep scaffold dated 2026-05-04 (roadmap#35) that invented Free /
+  Professional / Enterprise tiers with a 1,000-requests-per-month quota, per-minute
+  rate limits, webhook subscriptions and contractual SLAs. None of that exists.
+  GoReplay sells no metered API access of any kind: it is a binary you run on your
+  own hosts, priced as one flat annual licence. The scaffold has been discarded in
+  full and every value below was read off the provider's published pricing page.
 tags:
   - API Testing
   - HTTP Traffic
@@ -15,131 +22,118 @@ tags:
   - Network Capture
   - Open Source
   - Traffic Replay
-description: Machine-readable plans and pricing scaffold for this API provider. Conforms to the API Commons
-  Plans schema. Tier limits and prices are scaffold defaults; replace with provider-published values.
+description: >-
+  GoReplay's published pricing. Two editions only: an open-source build under
+  LGPL-3.0 at no cost, and GoReplay PRO at a flat $2,950 per year. Pricing is
+  per-licence, not per-request — there is no usage metering, no quota and no
+  overage, because the software runs entirely on the customer's own infrastructure
+  and never calls a vendor endpoint.
+plan_count: 2
+currency: USD
+billing_model: flat annual licence
+metered: false
+usage_metering_note: >-
+  No metric is metered. GoReplay has no hosted component, so the vendor observes no
+  usage and bills none. Cost scales with the customer's own capture/replay
+  infrastructure, not with a vendor invoice.
+purchase:
+  self_serve: true
+  processor: Paddle
+  checkout_url: https://pay.paddle.com/checkout/507701
+  contact_sales: https://goreplay.org/pro/
+  contact_sales_note: >-
+    "Contact Sales" on the PRO page opens a Google-Forms-backed enquiry form, not a
+    quoting system. There is no published enterprise price band above PRO.
+  tax_note: >-
+    Stated verbatim on the pricing page — "Annual subscription prices exclude
+    applicable taxes. Paddle displays the final amount before purchase."
+free_trial:
+  offered: false
+  note: >-
+    No time-limited PRO trial is advertised. The provider positions the open-source
+    edition as the evaluation path: "Start with open source — Capture HTTP, save
+    local files, filter or rewrite requests, use middleware and replay to a test
+    endpoint. These capabilities are enough to try a complete capture/replay
+    workflow."
 plans:
-  - id: goreplay-free
-    name: Free
-    type: freemium
-    description: Free entry tier for the GoReplay API surface. Intended for evaluation, prototyping, and
-      low-volume integrations. Real limits and pricing must be reconciled with the provider's published
-      plan documentation.
-    entries:
-      - label: API Requests
-        description: Monthly API request quota across all included endpoints
-        name: api_requests
-        type: quota
-        metric: requests
-        limit: 1000
-        timeFrame: month
-        geo: global
-        domains: []
-        unit: 1
-        price: '0.00'
-        userMultiplied: false
-      - label: Rate Limit
-        description: Maximum requests per minute on the free tier
-        name: rate_limit
-        type: rate
-        metric: requests_per_minute
-        limit: 10
-        timeFrame: minute
-        geo: global
-        domains: []
-        unit: 1
-        price: '0.00'
-        userMultiplied: false
+  - id: goreplay-oss
+    name: GoReplay (open source)
+    type: open-source
+    price: '0.00'
+    currency: USD
+    billing_period: none
+    license: LGPL-3.0-only
+    license_url: https://github.com/probelabs/goreplay/blob/master/LICENSE.txt
+    url: https://goreplay.org/docs/installation/
+    description: >-
+      The freely redistributable gor binary. No account, no key, no registration —
+      install and run.
+    quota: unlimited
+    overage: none
+    limits: []
     elements:
-      - name: Public Documentation
-      - name: Community Support
-      - name: Sandbox Access
-      - name: GoReplay
+      - name: HTTP capture (--input-raw)
+      - name: Replay to an HTTP target (--output-http)
+      - name: Save and replay local capture files (--output-file / --input-file)
+      - name: Request filtering
+      - name: Request rewriting
+      - name: External middleware
+      - name: Kafka input and output
+      - name: Elasticsearch stats output
+      - name: Distributed capture over TCP / WebSocket
+    excluded:
+      - name: Amazon S3 capture storage and replay
+        note: OSS builds explicitly print that S3 is PRO-only if an s3:// path is passed.
+      - name: Binary protocol capture and replay
+      - name: Keep-alive TCP session recognition (--recognize-tcp-sessions)
+      - name: Commercial licence
+      - name: Dedicated support
   - id: goreplay-pro
-    name: Professional
-    type: paid
-    description: Production tier for GoReplay. Provides higher quotas, priority support, and access to
-      the broader API portfolio. Pricing placeholder; align with the provider's pricing page.
-    entries:
-      - label: API Requests
-        description: Monthly API request quota
-        name: api_requests
-        type: quota
-        metric: requests
-        limit: 100000
-        timeFrame: month
-        geo: global
-        domains: []
-        unit: 1
-        price: TBD
-        userMultiplied: false
-      - label: Rate Limit
-        description: Maximum requests per minute on the professional tier
-        name: rate_limit
-        type: rate
-        metric: requests_per_minute
-        limit: 100
-        timeFrame: minute
-        geo: global
-        domains: []
-        unit: 1
-        price: '0.00'
-        userMultiplied: false
-      - label: Overage
-        description: Per-request price after monthly quota is exceeded
-        name: overage
-        type: metered
-        metric: requests
-        limit: -1
-        timeFrame: month
-        geo: global
-        domains: []
-        unit: 1000
-        price: TBD
-        userMultiplied: false
+    name: GoReplay PRO
+    type: commercial
+    price: '2950.00'
+    currency: USD
+    billing_period: year
+    price_display: $2,950 /year
+    license: >-
+      GoReplay PRO End-User License Agreement (Replay Software LLC). The Organization
+      License included with PRO permits installation on an unlimited number of hosts,
+      where a Host is any physical or virtual machine the customer controls.
+    license_url: https://github.com/probelabs/goreplay/blob/master/COMM-LICENSE
+    url: https://goreplay.org/pro/
+    description: >-
+      Everything in the open-source edition plus S3-backed captures, binary protocol
+      workflows, keep-alive TCP session recognition, a commercial licence and
+      dedicated support.
+    quota: unlimited
+    overage: none
+    seats: unlimited hosts
+    limits: []
     elements:
-      - name: All Production Endpoints
-      - name: Email Support
-      - name: SLA Targets
-      - name: Webhook Subscriptions
-      - name: GoReplay
-  - id: goreplay-enterprise
-    name: Enterprise
-    type: enterprise
-    description: Custom-negotiated tier for GoReplay. Includes dedicated capacity, contractual SLAs, security
-      review, data residency options, and named technical account management.
-    entries:
-      - label: API Requests
-        description: Negotiated request volume; -1 indicates uncapped subject to fair use
-        name: api_requests
-        type: quota
-        metric: requests
-        limit: -1
-        timeFrame: month
-        geo: configurable
-        domains: []
-        unit: 1
-        price: custom
-        userMultiplied: false
-      - label: Rate Limit
-        description: Negotiated burst and steady-state rate
-        name: rate_limit
-        type: rate
-        metric: requests_per_minute
-        limit: 1000
-        timeFrame: minute
-        geo: configurable
-        domains: []
-        unit: 1
-        price: custom
-        userMultiplied: false
-    elements:
-      - name: Unlimited / Negotiated Volume
-      - name: 24/7 Dedicated Support
-      - name: Contractual SLA
-      - name: Security & Compliance Review
-      - name: Dedicated Account Manager
-      - name: Custom Data Residency
-      - name: GoReplay
+      - name: Amazon S3 capture storage and replay
+      - name: Enhanced TCP session handling (keep-alive session recognition)
+      - name: Binary protocol capture and replay
+      - name: Priority expert support from the GoReplay team
+      - name: Commercial licence for enterprise use
+      - name: HTTP filtering and middleware (also available in open source)
+    caveats:
+      - >-
+        Stated on the pricing page: "TCP sessions do not automatically recreate
+        application login state."
+      - >-
+        Stated on the pricing page: "Replay alone does not check application
+        correctness: define the response and state comparisons your test needs."
+      - >-
+        Stated on the pricing page: capturing encrypted HTTPS requires access to
+        plaintext HTTP after TLS termination.
+discrepancies:
+  - field: price
+    note: >-
+      The provider's own https://goreplay.org/llms.txt describes PRO as
+      "$3000/year", while https://goreplay.org/pro/ shows $2,950/year in three
+      places. The pricing page is treated as authoritative; the llms.txt figure is
+      stale. Worth reporting to the provider — an agent reading only the llms.txt
+      would quote the wrong price.
 maintainers:
   - FN: Kin Lane
     email: kin@apievangelist.com

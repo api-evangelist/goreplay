@@ -1,0 +1,327 @@
+generated: '2026-09-13'
+method: searched
+source: >-
+  https://goreplay.org/docs/ (installation, the-basics, capturing, replaying,
+  files, filtering, rewriting, middleware, distributed, kafka, elasticsearch,
+  pro, troubleshooting, faq) cross-checked against the authoritative flag table in
+  https://raw.githubusercontent.com/probelabs/goreplay/master/settings.go
+provider: GoReplay
+providerId: goreplay
+name: gor
+description: >-
+  `gor` is GoReplay's single binary and its entire machine interface. GoReplay
+  publishes no HTTP API, so the command-line flag surface — not an OpenAPI — is the
+  contract a consumer or an agent integrates against. The model is a UNIX-style
+  pipeline: one or more `--input-*` plugins capture or read messages, optional
+  filter/rewrite/middleware stages transform them, and one or more `--output-*`
+  plugins emit them. Every flag below was read from the provider's own docs and
+  verified against the `flag` registrations in settings.go on the master branch.
+invocation: gor [--input-<plugin> VALUE ...] [--output-<plugin> VALUE ...] [options]
+subcommands: []
+subcommand_model: >-
+  none — `gor` has no verbs or subcommands. Behaviour is selected entirely by which
+  input and output plugins are wired together on a single invocation.
+install:
+  - method: binary
+    command: >-
+      wget https://github.com/buger/goreplay/releases/download/v1.3.3/gor_1.3.3_x64.tar.gz
+      && tar -xzf gor_1.3.3_x64.tar.gz && sudo mv gor /usr/local/bin/
+    platforms: [linux-x64, linux-arm64]
+  - method: homebrew
+    command: brew install gor
+    platforms: [macos-intel]
+  - method: homebrew
+    command: arch -arm64 brew install gor
+    platforms: [macos-arm64]
+  - method: scoop
+    command: scoop install gor
+    platforms: [windows-x64]
+  - method: docker
+    command: docker run -it --network host -v "$PWD:/data" buger/goreplay --input-raw :80 --output-stdout
+    platforms: [docker]
+  - method: go
+    command: go install github.com/buger/goreplay@latest
+    platforms: [source]
+  - method: source
+    command: git clone https://github.com/buger/goreplay.git && cd goreplay && make
+    platforms: [source]
+requirements:
+  os: Linux, macOS, or Windows — anywhere libpcap works
+  privileges: >-
+    root / Administrator for `--input-raw`, because packet capture needs raw
+    sockets. The docs recommend `setcap "cap_net_raw,cap_net_admin+eip"` on the
+    binary plus a dedicated group instead of running as root.
+  memory: minimum 256MB RAM
+  disk: 50MB free
+  notes: >-
+    Capturing encrypted HTTPS requires access to plaintext HTTP after TLS
+    termination — GoReplay does not decrypt TLS.
+version_flag:
+  supported: false
+  note: >-
+    The installation page states plainly that "gor --version is not a flag"; the
+    version is printed in the `gor --help` banner ("Current Version: v%s" in
+    settings.go). This is an agent-relevant gap: there is no scriptable way to read
+    the installed version without parsing help output.
+groups:
+  - name: inputs
+    description: Where messages come from. Repeatable — multiple inputs fan into one pipeline.
+    docs: https://goreplay.org/docs/capturing/
+    flags:
+      - flag: --input-raw
+        value: ":PORT or ADDR:PORT"
+        description: Capture live traffic from a port using raw sockets/libpcap. Requires sudo or CAP_NET_RAW.
+        repeatable: true
+        example: sudo gor --input-raw :8080 --output-stdout
+      - flag: --input-file
+        value: "PATH or PATH|SPEED%"
+        description: Replay requests previously recorded to a .gor file. The `|N%` suffix scales replay speed.
+        repeatable: true
+        example: gor --input-file "requests.gor|200%" --output-http="http://staging.example.com"
+      - flag: --input-tcp
+        value: ':PORT'
+        description: Receive messages from another Gor instance — the receiving half of a distributed setup.
+        repeatable: true
+      - flag: --input-dummy
+        value: ''
+        description: Emits a synthetic "GET /" request every second. Used for testing outputs.
+        repeatable: true
+      - flag: --input-kafka-host
+        value: HOST:PORT
+        description: Read messages from a Kafka broker.
+        repeatable: false
+  - name: input-raw-tuning
+    description: Capture-engine controls — the flags that decide whether a capture is complete.
+    docs: https://goreplay.org/docs/capturing/
+    flags:
+      - flag: --input-raw-engine
+        value: libpcap | raw_socket | pcap_file | vxlan
+        description: Interception engine. libpcap is the default.
+      - flag: --input-raw-protocol
+        value: http | binary
+        description: Application protocol of the intercepted traffic. `binary` is PRO-only.
+      - flag: --input-raw-buffer-size
+        value: BYTES
+        description: OS capture buffer size. Linux default is around 2MB; raise it when packets drop.
+      - flag: --input-raw-track-response
+        description: Also capture origin responses, not just requests. Required for middleware to see responses.
+      - flag: --input-raw-allow-incomplete
+        description: Keep partial/truncated messages rather than discarding them.
+      - flag: --input-raw-realip-header
+        description: Read the client IP from the named header instead of the packet source.
+      - flag: --input-raw-ignore-interface
+        description: Exclude named interfaces when listening on all of them. Repeatable; common in Kubernetes.
+        repeatable: true
+      - flag: --input-raw-promisc
+        description: Enable promiscuous mode.
+      - flag: --input-raw-expire
+        value: DURATION
+        description: How long to wait for a message to complete. Default 2s; matters most for binary protocols.
+      - flag: --input-raw-override-snaplen
+        description: Override the pcap snap length. Helps on some VMs.
+      - flag: --input-raw-bpf-filter
+        description: Raw BPF filter applied at capture time.
+      - flag: --input-raw-vxlan-vni
+        description: VXLAN VNI to capture. Repeatable; negative values exclude a VNI.
+        repeatable: true
+      - flag: --input-raw-vlan-vid
+        description: VLAN VID to capture. Repeatable.
+        repeatable: true
+      - flag: --input-raw-stats
+        description: Emit capture statistics.
+      - flag: --input-raw-monitor
+        description: Monitor-mode capture.
+      - flag: --input-raw-timestamp-type
+        description: pcap timestamp source.
+  - name: outputs
+    description: Where messages go. Repeatable — one input can fan out to several outputs.
+    docs: https://goreplay.org/docs/replaying/
+    flags:
+      - flag: --output-http
+        value: URL
+        description: Replay captured requests against an HTTP endpoint. The core shadow/load testing output.
+        repeatable: true
+        example: sudo gor --input-raw :8080 --output-http="http://staging.example.com"
+      - flag: --output-file
+        value: PATH or s3://BUCKET/PREFIX
+        description: Write messages to a .gor file. An s3:// path is PRO-only.
+        repeatable: true
+        example: sudo gor --input-raw :8080 --output-file=requests.gor
+      - flag: --output-stdout
+        description: Print messages to stdout. The standard "is my capture working" check.
+      - flag: --output-null
+        description: Discard messages. Used to measure capture without any replay side effect.
+      - flag: --output-tcp
+        value: HOST:PORT
+        description: Forward messages to another Gor instance over TCP.
+        repeatable: true
+      - flag: --output-ws
+        value: wss://HOST:PORT/PATH
+        description: Same as --output-tcp but over WebSocket.
+        repeatable: true
+      - flag: --output-binary
+        value: HOST:PORT
+        description: Forward binary-protocol payloads. PRO-only, paired with --input-raw-protocol binary.
+        repeatable: true
+      - flag: --output-kafka-host
+        value: HOST:PORT
+        description: Publish messages to a Kafka topic.
+      - flag: --output-http-elasticsearch
+        value: URL
+        description: Index request/response stats into Elasticsearch alongside HTTP replay.
+        example: >-
+          sudo gor --input-raw :8080 --output-http="http://staging.example.com"
+          --output-http-elasticsearch="http://elasticsearch:9200/gor"
+  - name: filtering
+    description: Drop messages before they are replayed. All regex-based, all repeatable.
+    docs: https://goreplay.org/docs/filtering/
+    flags:
+      - flag: --http-allow-url
+        description: Regexp against the full URL including domain. Non-matching requests are dropped.
+        repeatable: true
+      - flag: --http-disallow-url
+        description: Inverse of --http-allow-url.
+        repeatable: true
+      - flag: --http-allow-method
+        description: Whitelist of HTTP methods to replay. Repeatable.
+        repeatable: true
+      - flag: --http-allow-header
+        description: 'Regexp against a named header, e.g. api-version:^v1. Non-matching requests dropped.'
+        repeatable: true
+      - flag: --http-disallow-header
+        description: Inverse of --http-allow-header.
+        repeatable: true
+      - flag: --http-basic-auth-filter
+        description: Filter requests by HTTP Basic Auth credentials.
+        repeatable: true
+      - flag: --http-header-limiter
+        description: Percentage-based sampling keyed on a header value — deterministic traffic subsetting.
+        repeatable: true
+      - flag: --http-param-limiter
+        description: Percentage-based sampling keyed on a URL parameter value.
+        repeatable: true
+  - name: rewriting
+    description: Mutate requests in flight so production traffic is safe to replay at a test target.
+    docs: https://goreplay.org/docs/rewriting/
+    flags:
+      - flag: --http-set-header
+        description: "Inject a header, e.g. 'User-Agent: Gor'."
+        repeatable: true
+      - flag: --http-rewrite-header
+        description: 'Rewrite a header by regex mapping, e.g. Host: (.*).example.com,$1.beta.example.com.'
+        repeatable: true
+      - flag: --http-set-param
+        description: Set or overwrite a URL query parameter.
+        repeatable: true
+      - flag: --http-rewrite-url
+        description: Rewrite the request path by regex mapping.
+        repeatable: true
+      - flag: --http-original-host
+        description: Preserve the original Host header rather than rewriting it to the output target.
+  - name: middleware
+    description: Hand every message to an external program that can change or drop it.
+    docs: https://goreplay.org/docs/middleware/
+    flags:
+      - flag: --middleware
+        value: PATH
+        description: >-
+          Run an external program that reads messages from STDIN and writes modified
+          messages to STDOUT. The intended place for token handling, PII scrubbing
+          and custom routing.
+        example: sudo gor --input-raw :80 --middleware "/opt/middleware" --output-http="http://staging.example.com"
+      - flag: --js-middleware
+        value: PATH
+        description: >-
+          Run a JavaScript middleware under goja, distinct from --middleware.
+        status: documented-only
+        note: >-
+          DIVERGENCE — documented at https://goreplay.org/docs/middleware/ but no
+          `js-middleware` flag registration appears in settings.go, plugins.go,
+          middleware.go or http_modifier_settings.go on the master branch as of
+          2026-09-13. Recorded as the provider documents it, flagged because the
+          published source does not corroborate it.
+  - name: operations
+    description: Throughput, observability and lifecycle controls.
+    docs: https://goreplay.org/docs/troubleshooting/
+    flags:
+      - flag: --stats
+        description: Print queue statistics.
+      - flag: --verbose
+        value: LEVEL
+        description: Verbosity level. `--verbose 1` is the documented first debugging step.
+      - flag: --exit-after
+        value: DURATION
+        description: Stop after a fixed duration — the flag that makes a run finite and scriptable.
+        example: --exit-after 30s
+      - flag: --split-output
+        description: Round-robin messages across multiple outputs instead of duplicating to all of them.
+      - flag: --prettify-http
+        description: Decode chunked/gzipped bodies so captured HTTP is human readable.
+      - flag: --http-pprof
+        value: ':PORT'
+        description: >-
+          Expose the Go pprof profiling endpoints on a local port. This is a
+          debugging surface for the gor process itself, NOT a product API.
+      - flag: --copy-buffer-size
+        description: Per-request buffer size. Default 5MB.
+      - flag: --output-http-workers
+        description: Replay concurrency. Raise it when the output queue backs up.
+      - flag: --output-http-queue-len
+        description: Output queue depth.
+      - flag: --output-http-timeout
+        description: Per-request replay timeout.
+      - flag: --output-http-track-response
+        description: Capture replayed responses. Required for middleware to receive type-3 messages.
+      - flag: --output-file-size-limit
+        description: 'Chunk size for file output. Default: 32mb.'
+      - flag: --output-file-max-size-limit
+        description: 'Total cap on file output. Default: 1TB.'
+      - flag: --output-file-append
+        description: Append to an existing capture file rather than rotating.
+      - flag: --input-file-loop
+        description: Replay a capture file repeatedly instead of stopping at EOF.
+      - flag: --input-file-dry-run
+        description: >-
+          Read a capture file WITHOUT replaying it. The one true rehearsal mode in
+          the CLI — see conventions/goreplay-conventions.yml.
+  - name: pro
+    description: Flags and paths that only work in the commercial GoReplay PRO build.
+    docs: https://goreplay.org/docs/pro/
+    flags:
+      - flag: --recognize-tcp-sessions
+        description: >-
+          Pin a keep-alive TCP session to one outbound connection on replay. PRO-only;
+          also makes --split-output session-based.
+      - flag: --input-raw-protocol binary
+        description: Capture non-HTTP binary protocols. PRO-only.
+      - flag: --output-binary
+        description: Replay binary payloads. PRO-only.
+      - flag: 's3:// paths on --output-file / --input-file'
+        description: >-
+          S3-backed capture storage and replay. PRO-only — OSS builds explicitly
+          print that S3 is PRO-only if an s3:// path is passed. Credentials come from
+          standard AWS environment variables (AWS_ACCESS_KEY_ID / AWS_ACCESS_KEY,
+          AWS_SECRET_ACCESS_KEY / AWS_SECRET_KEY, AWS_REGION /
+          AWS_DEFAULT_REGION, AWS_ENDPOINT_URL, AWS_SESSION_TOKEN); AWS_SDK_LOAD_CONFIG
+          loads ~/.aws. S3 matching uses prefixes, not glob patterns.
+key_flows:
+  - name: Verify a capture point
+    command: sudo gor --input-raw :8080 --output-stdout
+    docs: https://goreplay.org/docs/installation/
+  - name: Shadow production HTTP onto staging
+    command: sudo gor --input-raw :8080 --output-http="http://staging.example.com"
+    docs: https://goreplay.org/docs/shadow-testing/
+  - name: Record traffic to a file
+    command: sudo gor --input-raw :8080 --output-file=requests.gor
+    docs: https://goreplay.org/docs/files/
+  - name: Load test by replaying a capture at 2x
+    command: gor --input-file "requests.gor|200%" --output-http="http://staging.example.com"
+    docs: https://goreplay.org/docs/load-testing/
+  - name: Stream request/response stats to Elasticsearch
+    command: >-
+      sudo gor --input-raw :8080 --output-http="http://staging.example.com"
+      --output-http-elasticsearch="http://elasticsearch:9200/gor"
+    docs: https://goreplay.org/docs/elasticsearch/
+  - name: Push capture off the web box (distributed)
+    command: 'gor --input-raw :80 --output-tcp replay.local:28020  # receiver: gor --input-tcp :28020 --output-http staging.com'
+    docs: https://goreplay.org/docs/distributed/

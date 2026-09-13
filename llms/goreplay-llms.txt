@@ -1,0 +1,83 @@
+# GoReplay
+
+> Open-source HTTP capture and replay. Use production traffic for shadow testing, load testing, and debugging — without putting a proxy on the critical path.
+
+GoReplay (also called Gor) listens on a network interface or port, records live HTTP requests, and replays them against another environment. It is not AWS VPC traffic mirroring, not a packet-level NTA product (Wireshark / SolarWinds / NetFlow), and not a synthetic load generator like JMeter or k6.
+
+- Site: https://goreplay.org/
+- GitHub: https://github.com/buger/goreplay
+- Docs: https://goreplay.org/docs/
+- Installation: https://goreplay.org/docs/installation/
+- PRO (S3, WebSockets, TCP sessions, commercial license, $3000/year): https://goreplay.org/pro/
+- Author: Leonid Bugaev
+
+## What it is for
+
+- Shadow testing / traffic replay: copy production HTTP onto staging to validate deploys
+- Load testing with real production traffic (speed up replay, e.g. 200%)
+- Capturing HTTP into files, Elasticsearch, Kafka, or S3 without application code changes
+- Middleware to filter, rewrite, or mask payloads before replay
+
+## What it is not
+
+- Not cloud packet mirroring (AWS VPC Traffic Mirroring, TAP/span ports)
+- Not network traffic analysis / NTA (NetFlow, DPI dashboards)
+- Not a JMeter/k6 replacement for writing synthetic VU scripts
+- Not a UI session-replay product (FullStory / Glassbox)
+
+## Product pages
+
+- Shadow testing: https://goreplay.org/shadow-testing/
+- Load testing with production traffic: https://goreplay.org/load-testing/
+- Load testing checklist: https://goreplay.org/load-testing-checklist/
+- Monitoring (HTTP to ES/Kafka/S3): https://goreplay.org/monitoring/
+- HTTP sessions (PRO TCP keepalive): https://goreplay.org/http-sessions/
+- Case studies: https://goreplay.org/case-studies/
+- Blog: https://goreplay.org/blog/
+
+## Key commands
+
+```
+# Capture HTTP on port 8080 and print requests
+sudo gor --input-raw :8080 --output-stdout
+
+# Shadow production HTTP onto staging
+sudo gor --input-raw :8080 --output-http="http://staging.example.com"
+
+# Record to a file
+sudo gor --input-raw :8080 --output-file=requests.gor
+
+# Replay recorded traffic at 2x speed
+gor --input-file "requests.gor|200%" --output-http="http://staging.example.com"
+
+# Index request/response stats into Elasticsearch (with HTTP replay)
+sudo gor --input-raw :8080 --output-http="http://staging.example.com" --output-http-elasticsearch="http://elasticsearch:9200/gor"
+```
+
+## Docs map
+
+Canonical docs: https://goreplay.org/docs/
+
+- Installation: https://goreplay.org/docs/installation/
+- The basics: https://goreplay.org/docs/the-basics/
+- Capturing: https://goreplay.org/docs/capturing/
+- Files: https://goreplay.org/docs/files/
+- Replaying: https://goreplay.org/docs/replaying/
+- Shadow testing: https://goreplay.org/docs/shadow-testing/
+- Load testing: https://goreplay.org/docs/load-testing/
+- Filtering: https://goreplay.org/docs/filtering/
+- Rewriting: https://goreplay.org/docs/rewriting/
+- Middleware: https://goreplay.org/docs/middleware/
+- Distributed: https://goreplay.org/docs/distributed/
+- Kafka: https://goreplay.org/docs/kafka/
+- Elasticsearch: https://goreplay.org/docs/elasticsearch/
+- HTTPS: https://goreplay.org/docs/https/
+- Windows: https://goreplay.org/docs/windows/
+- Troubleshooting: https://goreplay.org/docs/troubleshooting/
+- FAQ: https://goreplay.org/docs/faq/
+- PRO: https://goreplay.org/docs/pro/
+- Compile: https://goreplay.org/docs/compile/
+
+## License
+
+Open-source (LGPL). Commercial license and enterprise features: https://goreplay.org/pro/

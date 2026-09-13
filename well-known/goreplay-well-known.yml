@@ -1,0 +1,68 @@
+generated: '2026-09-13'
+method: probed
+source: live HTTPS probes on 2026-09-13
+provider: GoReplay
+providerId: goreplay
+description: >-
+  Full negative result. Every named /.well-known/ path was probed on both hosts this
+  record knows — the registrable domain goreplay.org and the docs alias
+  docs.goreplay.org — and all returned 404. There are no API baseURL hosts and no
+  OpenAPI servers[] hosts to add, because GoReplay publishes no HTTP API. No
+  WellKnown or SecurityTxt pointer is wired in apis.yml: this file records an
+  absence, and a pointer would assert a surface the provider does not serve.
+  www.goreplay.org resolves to goreplay.org (301) and is not probed separately.
+hosts:
+  - host: goreplay.org
+    documents:
+      - path: /.well-known/security.txt
+        status: 404
+        file: null
+      - path: /.well-known/openid-configuration
+        status: 404
+        file: null
+      - path: /.well-known/oauth-authorization-server
+        status: 404
+        file: null
+      - path: /.well-known/api-catalog
+        status: 404
+        file: null
+      - path: /.well-known/ai-plugin.json
+        status: 404
+        file: null
+      - path: /.well-known/agent-card.json
+        status: 404
+        file: null
+      - path: /.well-known/agent.json
+        status: 404
+        file: null
+  - host: docs.goreplay.org
+    documents:
+      - path: /.well-known/security.txt
+        status: 404
+        file: null
+      - path: /.well-known/openid-configuration
+        status: 404
+        file: null
+      - path: /.well-known/oauth-authorization-server
+        status: 404
+        file: null
+      - path: /.well-known/api-catalog
+        status: 404
+        file: null
+      - path: /.well-known/ai-plugin.json
+        status: 404
+        file: null
+      - path: /.well-known/agent-card.json
+        status: 404
+        file: null
+      - path: /.well-known/agent.json
+        status: 404
+        file: null
+related_probes:
+  - url: https://goreplay.org/llms.txt
+    status: 200
+    result: >-
+      HIT — a real llms.txt, saved verbatim to llms/goreplay-llms.txt and wired as
+      type LLMsTxt. Not a /.well-known/ document, recorded here for completeness.
+  - url: https://docs.goreplay.org/llms.txt
+    status: 404

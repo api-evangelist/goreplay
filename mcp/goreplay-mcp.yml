@@ -1,0 +1,34 @@
+generated: '2026-09-13'
+method: searched
+source: >-
+  Web search for a GoReplay MCP server; inspection of every public repository in the
+  probelabs GitHub organisation (which now owns goreplay); and a read of
+  https://goreplay.org/llms.txt, which enumerates the provider's surface and names no
+  MCP endpoint.
+provider: GoReplay
+providerId: goreplay
+status: none
+description: >-
+  No MCP server exists for GoReplay — neither hosted nor local-stdio. This file
+  records a completed search so a later round does not repeat it. NO MCPServer
+  pointer is wired in apis.yml, because none would be true.
+deployment:
+  mode: none
+  endpoint: null
+  install: null
+  package: null
+  auth: none
+  verified: searched
+derivation_possible: false
+derivation_note: >-
+  A candidate tool list could not be derived either. The pipeline derives candidate
+  MCP tools from OpenAPI operations, and GoReplay publishes no OpenAPI — its only
+  machine interface is the `gor` command line (see cli/goreplay-cli.yml). Inventing
+  tools from CLI flags would fabricate an agent surface the provider does not offer,
+  so none was written.
+adjacent_finding: >-
+  The probelabs organisation that now owns the goreplay repository does ship MCP
+  servers — docs-mcp ("Turn any github repo to MCP server") and big-brain ("BigBrain
+  MCP Server") among them. Those are separate Probe Labs products with their own
+  repositories and are NOT GoReplay surfaces; they are noted only so a future pass
+  does not mistake org-level MCP activity for a GoReplay MCP server.

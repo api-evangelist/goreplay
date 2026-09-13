@@ -1,0 +1,166 @@
+generated: '2026-09-13'
+method: searched
+source: >-
+  https://goreplay.org/docs/ (capturing, replaying, files, kafka, elasticsearch,
+  https, pro, troubleshooting), https://goreplay.org/pro/, and the flag table in
+  https://raw.githubusercontent.com/probelabs/goreplay/master/settings.go
+provider: GoReplay
+providerId: goreplay
+description: >-
+  Standards posture for GoReplay. Because the product is a capture/replay daemon
+  rather than an API, almost every API-shaped standard is not applicable — those are
+  recorded as conforms:false with the reason, so the absence is legible rather than
+  simply missing. The interesting rows are the wire formats GoReplay speaks as a
+  CLIENT (libpcap/pcap, Kafka, Elasticsearch, S3, SASL, TLS) and the one domain
+  standard for its own market that it does NOT adopt.
+conformance:
+  - id: pcap
+    name: libpcap / pcap capture format
+    conforms: true
+    evidence: https://goreplay.org/docs/capturing/
+    note: >-
+      libpcap is the default interception engine (--input-raw-engine libpcap), and
+      `pcap_file` is a supported engine value, so GoReplay can read a packet capture
+      produced by tcpdump or Wireshark. The troubleshooting page instructs users to
+      "capture a pcap with tcpdump and file a GitHub issue", confirming pcap as the
+      interchange format the project itself works in. --input-raw-override-snaplen
+      and --input-raw-buffer-size are pcap-level controls.
+  - id: http-1.1
+    name: HTTP/1.1 message semantics
+    conforms: true
+    evidence: https://goreplay.org/docs/replaying/
+    note: >-
+      Capture, filtering, rewriting and replay all operate on HTTP/1.1 request and
+      response messages, including chunked and gzipped bodies (--prettify-http
+      decodes them). The middleware protocol frames a raw HTTP message after its meta
+      header. No HTTP/2 or HTTP/3 support is claimed anywhere in the docs, and none
+      is asserted here.
+  - id: har
+    name: HTTP Archive (HAR) capture interchange format
+    conforms: false
+    evidence: https://goreplay.org/docs/files/
+    domain_standard: true
+    note: >-
+      DOMAIN-STANDARD GAP, recorded as a finding rather than a penalty. HAR is the
+      interchange format for captured HTTP in this market — it is what browsers,
+      proxies and most API testing tools import and export. GoReplay neither reads
+      nor writes it: captures go to a proprietary, unversioned .gor file consumed
+      only by --input-file, and no converter is published. The practical consequence
+      is that a GoReplay capture cannot be handed to another tool, and traffic
+      captured by another tool cannot be replayed by GoReplay, without a bespoke
+      converter. Nothing in the docs claims HAR support; this row exists because the
+      standard exists and adoption is the buyer-relevant question.
+  - id: kafka-wire-protocol
+    name: Apache Kafka producer/consumer protocol
+    conforms: true
+    evidence: https://goreplay.org/docs/kafka/
+    note: >-
+      Both directions are implemented — --input-kafka-host / --input-kafka-topic and
+      --output-kafka-host / --output-kafka-topic — with a JSON framing option
+      (--input-kafka-json-format / --output-kafka-json-format) and configurable
+      consumer offset (--input-kafka-offset).
+  - id: sasl
+    name: SASL authentication (Kafka)
+    conforms: true
+    evidence: https://raw.githubusercontent.com/probelabs/goreplay/master/settings.go
+    note: >-
+      --input-kafka-use-sasl / --output-kafka-use-sasl with username, password and a
+      selectable --input-kafka-mechanism / --output-kafka-mechanism.
+  - id: tls
+    name: TLS transport security (client side)
+    conforms: true
+    evidence: https://goreplay.org/docs/https/
+    note: >-
+      TLS is supported on the transports GoReplay speaks — --input-tcp-secure /
+      --output-tcp-secure with --input-tcp-certificate and
+      --input-tcp-certificate-key, Kafka TLS via --kafka-tls-ca-cert /
+      --kafka-tls-client-cert / --kafka-tls-client-key, and skip-verify escapes on
+      the HTTP, TCP and WebSocket outputs. GoReplay does NOT decrypt TLS: capturing
+      HTTPS requires access to plaintext HTTP after TLS termination.
+  - id: elasticsearch-api
+    name: Elasticsearch indexing API
+    conforms: true
+    evidence: https://goreplay.org/docs/elasticsearch/
+    note: >-
+      --output-http-elasticsearch indexes request/response stats into an
+      Elasticsearch index, e.g. http://elasticsearch:9200/gor.
+  - id: s3-api
+    name: Amazon S3 object API
+    conforms: true
+    evidence: https://goreplay.org/docs/pro/
+    note: >-
+      PRO only. s3:// URLs on --output-file and --input-file, authenticated through
+      the standard AWS environment variables and honouring AWS_ENDPOINT_URL, which
+      makes it work against S3-compatible stores such as MinIO. Object selection is
+      by key prefix, not glob.
+  - id: websocket
+    name: WebSocket transport (RFC 6455)
+    conforms: true
+    evidence: https://raw.githubusercontent.com/probelabs/goreplay/master/settings.go
+    note: --output-ws forwards messages to another Gor instance over wss://.
+  - id: semver
+    name: Semantic Versioning
+    conforms: partial
+    evidence: https://github.com/probelabs/goreplay/releases
+    note: >-
+      Version numbers are semver-shaped but tag formatting is inconsistent (v1.3.2,
+      1.3.3, v1.3.0_RC11), so tags do not sort reliably and no compatibility
+      guarantee is published alongside them.
+  - id: lgpl-3.0
+    name: LGPL-3.0-only (SPDX)
+    conforms: true
+    evidence: https://github.com/probelabs/goreplay/blob/master/LICENSE.txt
+    note: >-
+      Confirmed independently by the Homebrew formula metadata, which records
+      license LGPL-3.0-only. Documentation under the repository doc/ directory is
+      CC BY-SA 4.0. GitHub's own licence detector reports NOASSERTION because the
+      repository ships two licences side by side (LICENSE.txt and COMM-LICENSE).
+  - id: oauth2
+    name: OAuth 2.0
+    conforms: false
+    evidence: https://goreplay.org/docs/
+    note: Not applicable — no API and no authorization surface. /.well-known/oauth-authorization-server returns 404.
+  - id: oidc
+    name: OpenID Connect
+    conforms: false
+    evidence: https://goreplay.org/docs/
+    note: Not applicable. /.well-known/openid-configuration returns 404.
+  - id: rfc9457
+    name: RFC 9457 Problem Details for HTTP APIs
+    conforms: false
+    evidence: https://goreplay.org/docs/troubleshooting/
+    note: >-
+      Not applicable — no HTTP responses are produced. Failures surface as process log
+      output described narratively on the troubleshooting page, with no enumerated
+      error identifiers.
+  - id: openapi
+    name: OpenAPI
+    conforms: false
+    evidence: https://goreplay.org/
+    note: >-
+      No OpenAPI is published. Probed /openapi.json, /openapi.yaml, /swagger.json and
+      /api-docs on goreplay.org and docs.goreplay.org — all 404. This is correct
+      rather than a gap: there is no HTTP API to describe. The machine-readable
+      contract for this product is the CLI flag surface, captured in
+      cli/goreplay-cli.yml.
+  - id: rfc9116
+    name: RFC 9116 security.txt
+    conforms: false
+    evidence: https://goreplay.org/.well-known/security.txt
+    note: 404 on every host probed. No security.txt, and no SECURITY.md in the repository.
+compliance:
+  certifications: []
+  programs: []
+  published: false
+  note: >-
+    No SOC 2, ISO 27001, PCI, HIPAA, FedRAMP or equivalent certification is claimed,
+    and no trust centre exists (https://goreplay.org/security/ returns 404). This is
+    coherent with the delivery model: GoReplay processes customer traffic entirely
+    inside customer infrastructure and the vendor receives no customer data, so there
+    is no vendor-side control environment to certify. No Compliance pointer is wired
+    in apis.yml, because none would be true.
+  data_handling_note: >-
+    The provider does push handling responsibility onto the operator — the middleware
+    page frames token handling and PII masking as the customer's job, and the PRO
+    contact form asks users to "leave out credentials and production request data".
+    Replaying production traffic is a data-protection decision the adopter owns.

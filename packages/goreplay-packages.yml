@@ -1,0 +1,130 @@
+generated: '2026-09-13'
+method: searched
+source: >-
+  https://goreplay.org/docs/installation/ plus registry metadata endpoints —
+  proxy.golang.org, formulae.brew.sh, hub.docker.com/v2, and the
+  github.com/probelabs/goreplay releases API.
+provider: GoReplay
+providerId: goreplay
+description: >-
+  GoReplay ships a single distributable — the `gor` binary. It publishes NO client
+  SDK and NO client libraries, because the product is a command-line traffic
+  capture/replay daemon rather than a hosted API. Everything below is a
+  distribution channel for that one binary, which is why no `SDKs` pointer is
+  wired in apis.yml: there is no API for an SDK to wrap.
+note: >-
+  CURRENCY FINDING — every first-party distribution channel is stalled on the 2021
+  line. The last stable GitHub release is v1.3.3 (2021-10-06); the Go module proxy
+  serves v1.3.2 (2021-08-19) as @latest; Homebrew's `gor` formula is pinned to
+  1.3.3; the Docker Hub image was last pushed in 2017. Meanwhile the master branch
+  reports itself as v2.0.0 (goreplay.org/docs/installation/ says "this checkout
+  reports v2.0.0") and the repository was pushed as recently as 2026-01-27, so the
+  shipped artifacts are roughly five years behind the source. The only v2 tags ever
+  published are the 2022 prereleases v2.0.0-rc1 / v2.0.0-rc2.
+repository_moved:
+  from: https://github.com/buger/goreplay
+  to: https://github.com/probelabs/goreplay
+  observed: '2026-09-13'
+  evidence: >-
+    https://github.com/buger/goreplay now 301-redirects to
+    https://github.com/probelabs/goreplay; the GitHub API reports
+    full_name probelabs/goreplay. The provider's own site, docs and llms.txt still
+    link the old buger/* path, which GitHub resolves by rename.
+packages:
+  - language: go
+    registry: go
+    name: github.com/probelabs/goreplay
+    url: https://pkg.go.dev/github.com/buger/goreplay
+    install: go install github.com/buger/goreplay@latest
+    official: true
+    version: v1.3.2
+    published: '2021-08-19'
+    kind: command
+    note: >-
+      A Go `command` (package main), not an importable client library. Version and
+      date read from https://proxy.golang.org/github.com/probelabs/goreplay/@latest,
+      which resolves the renamed path and returns
+      {"Version":"v1.3.2","Time":"2021-08-19T17:47:56Z"}. The install line is the
+      one the provider prints on its installation page, still using the old path.
+  - language: n/a
+    registry: homebrew
+    name: gor
+    url: https://formulae.brew.sh/formula/gor
+    install: brew install gor
+    official: true
+    version: 1.3.3
+    published: null
+    note: >-
+      Homebrew core formula, desc "Real-time HTTP traffic replay tool written in Go",
+      homepage https://goreplay.org, license LGPL-3.0-only — read from
+      https://formulae.brew.sh/api/formula/gor.json. Homebrew's formula API exposes
+      no publish date for the pinned stable version, so `published` is null rather
+      than guessed. macOS install path named on the provider's installation page.
+  - language: n/a
+    registry: scoop
+    name: gor
+    url: https://scoop.sh/
+    install: scoop install gor
+    official: true
+    version: null
+    published: null
+    note: >-
+      Windows install method named verbatim on
+      https://goreplay.org/docs/installation/. Scoop is a manifest-bucket
+      distribution with no first-party metadata endpoint for this package, so
+      version/date are recorded as null (checked, nothing to record) rather than
+      inferred.
+  - language: n/a
+    registry: dockerhub
+    name: buger/goreplay
+    url: https://hub.docker.com/r/buger/goreplay
+    install: docker pull buger/goreplay
+    official: true
+    version: latest
+    published: '2017-05-18'
+    note: >-
+      https://hub.docker.com/v2/repositories/buger/goreplay/ reports
+      last_updated 2017-05-18 and 761,837 pulls. The `latest` tag is unpinned, so a
+      consumer cannot tell which build they receive — and the registry's own
+      last_updated says that build is from 2017. Namespace is still the founder's
+      personal `buger`, not `probelabs`.
+  - language: n/a
+    registry: github-releases
+    name: gor
+    url: https://github.com/probelabs/goreplay/releases
+    install: >-
+      wget https://github.com/buger/goreplay/releases/download/v1.3.3/gor_1.3.3_x64.tar.gz
+      && tar -xzf gor_1.3.3_x64.tar.gz && sudo mv gor /usr/local/bin/
+    official: true
+    version: v1.3.3
+    published: '2021-10-06'
+    note: >-
+      Prebuilt tarballs for linux x64 and arm64, the channel the installation page
+      defaults to. Read from the releases API: 1.3.3 published 2021-10-06T18:00:17Z,
+      prerelease false. Newer tags exist but are prereleases (v2.0.0-rc1 and
+      v2.0.0-rc2, both 2022-02-07).
+  - language: go
+    registry: source
+    name: probelabs/goreplay
+    url: https://github.com/probelabs/goreplay
+    install: git clone https://github.com/buger/goreplay.git && cd goreplay && make
+    official: true
+    version: v2.0.0
+    published: null
+    kind: source
+    note: >-
+      Build-from-source path documented at https://goreplay.org/docs/compile/ and on
+      the installation page, which states the current checkout reports v2.0.0.
+      Unreleased — no v2.0.0 tag has ever been published, so `published` is null. The
+      repo's default branch is `master`, last pushed 2026-01-27.
+absent_registries:
+  - registry: npm
+    checked: '2026-09-13'
+    status: 404
+    note: registry.npmjs.org/goreplay returns 404 — no npm distribution.
+  - registry: snapcraft
+    checked: '2026-09-13'
+    status: 404
+    note: >-
+      https://snapcraft.io/gor returns 404 even though the repository carries a
+      snapcraft.yaml — the snap was never published or has been removed.

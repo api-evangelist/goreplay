@@ -1,93 +1,144 @@
 aid: goreplay
 name: GoReplay
-description: >-
-  GoReplay is an open source network traffic capture and replay tool that allows
-  teams to record live HTTP traffic and replay it in test environments, enabling
-  realistic load testing and API testing with real production data.
+description: GoReplay is an open source network traffic capture and replay tool, distributed as a single
+  `gor` binary under LGPL-3.0, that records live HTTP traffic on a server and replays it against another
+  environment for shadow testing, load testing with real production traffic, and debugging. It sits off
+  the critical path rather than acting as a proxy, captures via libpcap without application changes, and
+  can filter, rewrite or hand each message to external middleware before replay. A commercial GoReplay
+  PRO edition ($2,950/year) adds Amazon S3 capture storage, binary protocol support, keep-alive TCP session
+  recognition and dedicated support. GoReplay publishes no HTTP API of its own; its machine-readable contract
+  is the CLI flag surface plus a documented middleware STDIN/STDOUT wire protocol.
 type: Index
 deliveryModel:
-  model: saas
-  open_source: false
+  model: open-core
+  license: LGPL-3.0-only
+  open_source: true
   commercial: true
   callable_host: false
-  label: Hosted service · you call their endpoint
-  confidence: medium
+  label: Open core · an OSS project plus a commercial hosted product
+  confidence: high
   source:
+  - license
   - pricing
-  generated: '2026-08-28'
-  method: derived
+  - docs
+  generated: '2026-09-13'
+  method: searched
+  note: 'CORRECTED 2026-09-13. The prior derived block said model: saas, open_source: false, label ''Hosted
+    service · you call their endpoint'' — wrong on all three counts. GoReplay is LGPL-3.0-only open source
+    (LICENSE.txt, corroborated by the Homebrew formula metadata) with a paid proprietary PRO build governed
+    by a separate EULA (COMM-LICENSE, licensor Replay Software LLC). There is no hosted service and no
+    endpoint to call: both editions are binaries the customer runs on their own hosts, which is why callable_host
+    stays false. The canonical open-core label says ''commercial hosted product''; for GoReplay the commercial
+    half is a self-hosted PRO build, not a hosted service.'
 accessModel:
   pricing: freemium
-  onboarding: unknown
+  onboarding: none
   trial: false
   try_now: false
   public: false
   label: Freemium
-  confidence: medium
+  confidence: high
   source:
   - plans
-  generated: '2026-07-22'
-  method: derived
+  - pricing
+  generated: '2026-09-13'
+  method: searched
+  note: Open-source edition is free and needs no account, key or registration — onboarding is simply installing
+    the binary. GoReplay PRO is a flat $2,950/year licence bought self-serve through Paddle with no advertised
+    time-limited trial; the provider positions the OSS edition as the evaluation path. public:false records
+    that there is no publicly callable API, not that the software is unavailable.
 image: https://kinlane-images.s3.amazonaws.com/shared/apis-json/icons/goreplay.png
 tags:
-  - API Testing
-  - Developer Tools
-  - HTTP Traffic
-  - Load Testing
-  - Network Capture
-  - Open-Source
-  - Traffic Replay
+- API Testing
+- Developer Tools
+- HTTP Traffic
+- Load Testing
+- Network Capture
+- Open-Source
+- Traffic Replay
 tags_raw:
-  - API Testing
-  - HTTP Traffic
-  - Load Testing
-  - Network Capture
-  - Open Source
-  - Traffic Replay
+- API Testing
+- HTTP Traffic
+- Load Testing
+- Network Capture
+- Open Source
+- Traffic Replay
 url: https://raw.githubusercontent.com/api-evangelist/goreplay/refs/heads/main/apis.yml
 created: '2026-03-26'
-modified: '2026-04-28'
+modified: '2026-09-13'
 specificationVersion: '0.23'
 apis:
-  - aid: goreplay:goreplay-tool
-    name: GoReplay
-    description: >-
-      GoReplay captures and replays live HTTP traffic, enabling developers to
-      test APIs and applications with real production traffic patterns without
-      impacting production systems.
-    humanURL: https://goreplay.org
-    properties:
-      - type: Documentation
-        url: https://github.com/buger/goreplay/wiki
-      - type: GettingStarted
-        url: https://github.com/buger/goreplay/wiki/Getting-Started
-      - type: GitHubOrg
-        url: https://github.com/buger/goreplay
-    tags:
-      - API Testing
-      - Load Testing
-      - Open-Source
-      - Traffic Replay
-    tags_raw:
-      - API Testing
-      - Load Testing
-      - Open Source
-      - Traffic Replay
-common:
-  - type: DomainSecurity
-    url: security/goreplay-domain-security.yml
-  - type: Website
-    url: https://goreplay.org
+- aid: goreplay:goreplay-tool
+  name: GoReplay
+  description: GoReplay captures live HTTP traffic with libpcap and replays it against a test target,
+    letting teams validate deploys, configuration changes and infrastructure changes against real production
+    traffic patterns without touching production. Operated entirely through the `gor` command line; there
+    is no hosted endpoint and no API base URL.
+  humanURL: https://goreplay.org
+  image: https://kinlane-images.s3.amazonaws.com/shared/apis-json/icons/goreplay.png
+  properties:
   - type: Documentation
-    url: https://github.com/buger/goreplay/wiki
-  - type: GitHub
-    url: https://github.com/buger/goreplay
+    url: https://goreplay.org/docs/
   - type: GettingStarted
-    url: https://github.com/buger/goreplay/wiki/Getting-Started
-  - type: Pricing
-    url: https://goreplay.org/pro.html
-  - type: Support
-    url: https://github.com/buger/goreplay/issues
+    url: https://goreplay.org/docs/installation/
+  - type: GitHubOrganization
+    url: https://github.com/probelabs/goreplay
+  - type: CLI
+    url: cli/goreplay-cli.yml
+  tags:
+  - API Testing
+  - Load Testing
+  - Open-Source
+  - Traffic Replay
+  tags_raw:
+  - API Testing
+  - Load Testing
+  - Open Source
+  - Traffic Replay
+  x-baseURL-note: No baseURL. GoReplay ships no hosted API — the software runs on the customer's own hosts
+    and never calls a vendor endpoint. Recorded as genuinely absent rather than guessed from the domain.
+common:
+- type: Website
+  url: https://goreplay.org
+- type: Documentation
+  url: https://goreplay.org/docs/
+- type: GettingStarted
+  url: https://goreplay.org/docs/installation/
+- type: GitHubOrganization
+  url: https://github.com/probelabs/goreplay
+- type: Support
+  url: https://github.com/probelabs/goreplay/issues
+- type: Blog
+  url: https://goreplay.org/blog/
+- type: Pricing
+  url: https://goreplay.org/pro/
+- type: TermsOfService
+  url: https://github.com/probelabs/goreplay/blob/master/COMM-LICENSE
+- type: CLI
+  url: cli/goreplay-cli.yml
+- type: Packages
+  url: packages/goreplay-packages.yml
+- type: LLMsTxt
+  url: llms/goreplay-llms.txt
+- type: ChangeLog
+  url: changelog/goreplay-changelog.yml
+- type: Lifecycle
+  url: lifecycle/goreplay-lifecycle.yml
+- type: Conventions
+  url: conventions/goreplay-conventions.yml
+- type: Conformance
+  url: conformance/goreplay-conformance.yml
+- type: Plans
+  url: plans/goreplay-plans-pricing.yml
+- type: RateLimits
+  url: rate-limits/goreplay-rate-limits.yml
+- type: DomainSecurity
+  url: security/goreplay-domain-security.yml
 maintainers:
-  - FN: Kin Lane
-    email: kin@apievangelist.com
+- FN: Kin Lane
+  email: kin@apievangelist.com
+x-enrichment:
+  date: '2026-09-13'
+  status: enriched
+  artifacts_added: 9
+  pass: local-v3

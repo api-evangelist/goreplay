@@ -1,0 +1,123 @@
+generated: '2026-09-13'
+method: searched
+source: >-
+  https://goreplay.org/docs/, https://goreplay.org/pro/,
+  https://github.com/probelabs/goreplay/releases, and negative probes of
+  /changelog/, /status/, /roadmap/, /security/, /terms/ and /privacy/ on
+  goreplay.org (all 404 on 2026-09-13).
+provider: GoReplay
+providerId: goreplay
+description: >-
+  Lifecycle posture for GoReplay, a CLI distributed as tagged releases rather than a
+  hosted API. There is no runtime to have an SLA or a status page, and the questions
+  that matter to a consumer are release cadence, version pinning and support scope.
+versioning:
+  scheme: semver
+  applies_to: the gor binary and its Go module
+  current_stable: 1.3.3
+  current_stable_date: '2021-10-06'
+  version_in_url: false
+  version_header: null
+  note: >-
+    Tag prefixes are inconsistent (v1.3.2 vs 1.3.3 vs v1.3.0_RC11), so tags do not
+    sort reliably. The master branch self-reports v2.0.0 but no v2.0.0 tag has ever
+    been published — only the 2022 release candidates.
+  pinning: >-
+    Pin by release tag (the tarball URLs are tag-scoped) or by Go module version.
+    The Docker `latest` tag is unpinned and the registry reports its build as 2017,
+    so Docker consumers cannot determine what they are running.
+release_channel:
+  url: https://github.com/probelabs/goreplay/releases
+  type: github-releases
+  status: 200
+  last_stable: '2021-10-06'
+  last_tag_of_any_kind: '2022-02-07'
+  cadence: >-
+    Dormant. Twelve stable releases between 2015 and 2021, then nothing stable for
+    almost five years, while the repository itself was pushed as recently as
+    2026-01-27.
+deprecation_policy:
+  published: false
+  url: null
+  sunset_header: false
+  deprecation_header: false
+  rfc8594: false
+  note: >-
+    No deprecation or sunset policy is published anywhere on goreplay.org or in the
+    repository. Flags have in fact been removed without a policy — the docs note
+    "There is no --output-http-stats anymore" and the FAQ says "Do not use
+    --input-http; it is not a current flag" — which is the removal record standing in
+    for a policy. RFC 8594 Sunset/Deprecation headers are not applicable: there is no
+    HTTP API.
+sla:
+  published: false
+  url: null
+  note: >-
+    No SLA. PRO ($2,950/year) offers "dedicated support from the GoReplay team for
+    setup and deployment questions" with no stated response time or availability
+    commitment.
+status_page:
+  published: false
+  url: null
+  probes:
+    - url: https://status.goreplay.org
+      status: 0
+      note: DNS does not resolve.
+    - url: https://goreplay.statuspage.io
+      status: 200
+      note: >-
+        FALSE POSITIVE — 200 only because it redirects to
+        https://www.atlassian.com/software/statuspage, Atlassian's own marketing
+        page. No GoReplay status page exists.
+    - url: https://goreplay.org/status/
+      status: 404
+  note: >-
+    Correctly absent. GoReplay runs on the customer's own hosts; there is no vendor
+    service whose uptime could be reported.
+support:
+  channels:
+    - type: issues
+      url: https://github.com/probelabs/goreplay/issues
+      note: >-
+        Primary community channel. 341 open issues at the time of this pass; the
+        troubleshooting page directs users to "capture a pcap with tcpdump and file a
+        GitHub issue".
+    - type: contact-form
+      url: https://goreplay.org/pro/
+      note: Google-Forms-backed "Talk to the GoReplay team" form on the PRO page.
+    - type: email
+      url: https://goreplay.org/pro/
+      note: >-
+        An email address is published in the site footer and on the PRO page but is
+        served through Cloudflare email obfuscation, so it is not machine-readable
+        without executing the page script. Not transcribed here.
+    - type: paid
+      url: https://goreplay.org/pro/
+      note: Dedicated support is a listed PRO entitlement.
+end_of_life:
+  declared: false
+  archived: false
+  note: >-
+    The repository is not archived (GitHub reports archived:false) and has recent
+    pushes, so this is not an abandoned project — but it is an unreleased one. The
+    gap between a live master branch and a 2021 stable release is the single most
+    important lifecycle fact for anyone adopting it.
+ownership:
+  author: Leonid Bugaev
+  commercial_entity: Replay Software LLC
+  commercial_entity_source: https://github.com/probelabs/goreplay/blob/master/COMM-LICENSE
+  repository_owner: probelabs
+  repository_owner_note: >-
+    The canonical repository moved from the founder's personal account
+    (github.com/buger/goreplay) to the probelabs organisation ("Probe",
+    probelabs.com). GitHub resolves the old path by redirect, and the provider's own
+    site, docs and llms.txt still publish the buger/* URLs.
+licensing:
+  open_source: LGPL-3.0-only
+  open_source_source: https://github.com/probelabs/goreplay/blob/master/LICENSE.txt
+  docs_license: CC BY-SA 4.0 (content under the repository doc/ directory)
+  commercial: >-
+    GoReplay PRO End-User License Agreement, licensor Replay Software LLC, granting a
+    non-exclusive non-transferable licence; the Organization License permits install
+    on unlimited hosts.
+  commercial_source: https://github.com/probelabs/goreplay/blob/master/COMM-LICENSE
