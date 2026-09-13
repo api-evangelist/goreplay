@@ -31,6 +31,7 @@ accessModel:
 image: https://kinlane-images.s3.amazonaws.com/shared/apis-json/icons/goreplay.png
 tags:
   - API Testing
+  - Developer Tools
   - HTTP Traffic
   - Load Testing
   - Network Capture
