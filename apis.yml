@@ -53,7 +53,7 @@ tags:
 - HTTP Traffic
 - Load Testing
 - Network Capture
-- Open-Source
+- Open Source
 - Traffic Replay
 tags_raw:
 - API Testing
@@ -62,6 +62,7 @@ tags_raw:
 - Network Capture
 - Open Source
 - Traffic Replay
+- Open-Source
 url: https://raw.githubusercontent.com/api-evangelist/goreplay/refs/heads/main/apis.yml
 created: '2026-03-26'
 modified: '2026-09-13'
@@ -87,13 +88,14 @@ apis:
   tags:
   - API Testing
   - Load Testing
-  - Open-Source
+  - Open Source
   - Traffic Replay
   tags_raw:
   - API Testing
   - Load Testing
   - Open Source
   - Traffic Replay
+  - Open-Source
   x-baseURL-note: No baseURL. GoReplay ships no hosted API — the software runs on the customer's own hosts
     and never calls a vendor endpoint. Recorded as genuinely absent rather than guessed from the domain.
 common:
