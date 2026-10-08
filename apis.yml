@@ -99,6 +99,8 @@ apis:
   x-baseURL-note: No baseURL. GoReplay ships no hosted API — the software runs on the customer's own hosts
     and never calls a vendor endpoint. Recorded as genuinely absent rather than guessed from the domain.
 common:
+- type: FinOps
+  url: finops/goreplay-finops.yml
 - type: Website
   url: https://goreplay.org
 - type: Documentation
