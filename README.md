@@ -64,51 +64,108 @@
 > Full detail: **[Where this data comes from](https://apievangelist.com/about/where-our-data-comes-from)**
 <!-- API-EVANGELIST-PROVENANCE:END -->
 
-GoReplay is an open source network traffic capture and replay tool that allows teams to record live HTTP traffic and replay it in test environments, enabling realistic load testing and API testing with real production traffic patterns.
+GoReplay is an open source network traffic capture and replay tool, distributed as a single `gor` binary under LGPL-3.0, that records live HTTP traffic on a server and replays it against another environment for shadow testing, load testing with real production traffic, and debugging. It sits off the critical path rather than acting as a proxy, captures via libpcap without application changes, and can filter, rewrite or hand each message to external middleware before replay. A commercial GoReplay PRO edition ($2,950/year) adds Amazon S3 capture storage, binary protocol support, keep-alive TCP session recognition and dedicated support. GoReplay publishes no HTTP API of its own; its machine-readable contract is the CLI flag surface plus a documented middleware STDIN/STDOUT wire protocol.
 
-**Type:** Index (open source)
-**License:** LGPLv3
-**Website:** https://goreplay.org
+**Areas:** API Testing · HTTP Traffic · Load Testing · Network Capture · Open Source · Traffic Replay
 
-## Tags
+## GoReplay on APIs.io
 
-- API Testing
-- HTTP Traffic
-- Load Testing
-- Network Capture
-- Open Source
-- Traffic Replay
+Everything profiled for GoReplay is published on APIs.io rather than in this repository. Start at the provider page — **[apis.io/providers/goreplay/](https://apis.io/providers/goreplay/)** — or go straight to one of the APIs or properties below.
 
-## What It Does
+### APIs (1)
 
-GoReplay sniffs HTTP traffic from a network interface, then writes that captured traffic to a file or pipes it directly into a different environment. Teams use it to:
+- [GoReplay](https://apis.io/apis/goreplay/goreplay-tool/) — GoReplay captures live HTTP traffic with libpcap and replays it against a test target, letting teams validate deploys, configuration changes and…
 
-- Validate infrastructure changes against real production traffic before deployment
-- Run shadow tests against multiple service versions simultaneously
-- Build load tests that mirror real-world traffic patterns rather than synthetic test cases
-- Plan and validate infrastructure migrations
-- Continuously test in production-like environments
+### Published properties
 
-## Catalog
+Each property below is a page on APIs.io carrying the machine-readable artifact and what it says.
 
-| Item | Path |
-|------|------|
-| APIs.yml | [apis.yml](apis.yml) |
+#### Security (1)
 
-## Common Properties
+Authentication, trust centre, and vulnerability disclosure.
+
+- [Goreplay Domain Security](https://apis.io/security/goreplay/goreplay-domain-security/)
+
+#### Plans and pricing (1)
+
+Published plans, tiers and prices.
+
+- [Goreplay Plans Pricing](https://apis.io/plans/goreplay/goreplay-plans-pricing/)
+
+#### Rate limits (1)
+
+Published request limits.
+
+- [Goreplay Rate Limits](https://apis.io/rate-limits/goreplay/goreplay-rate-limits/)
+
+#### FinOps (1)
+
+What the API costs to run, by operation.
+
+- [Goreplay Finops](https://apis.io/finops/goreplay/goreplay-finops/)
+
+## Where to find this API
+
+Links to the company's own pages. This repository publishes no copy of their specifications — the canonical document is theirs and lives at the URLs below.
 
 - [Website](https://goreplay.org)
-- [Documentation](https://github.com/buger/goreplay/wiki)
-- [GitHub](https://github.com/buger/goreplay)
-- [Getting Started](https://github.com/buger/goreplay/wiki/Getting-Started)
-- [Pricing (Pro)](https://goreplay.org/pro.html)
-- [Support / Issues](https://github.com/buger/goreplay/issues)
+- [Documentation](https://goreplay.org/docs/)
+- [Getting started](https://goreplay.org/docs/installation/)
+- [Pricing](https://goreplay.org/pro/)
+- [Support](https://github.com/probelabs/goreplay/issues)
+- [Blog](https://goreplay.org/blog/)
+- [Terms of service](https://github.com/probelabs/goreplay/blob/master/COMM-LICENSE)
+- [GitHub](https://github.com/probelabs/goreplay)
 
-## Timestamps
+## API Evangelist rating
 
-- **Created:** 2026-03-26
-- **Modified:** 2026-04-28
+**Kin Score 26.5** — thin · rubric 0.24.0 · scored 2026-10-17
 
-## Maintainers
+| Facet | Score |
+|---|---|
+| Discoverability | 64.3 |
+| Contract quality | 0.0 |
+| Contract governance | 18.2 |
+| Operational transparency | 18.4 |
+| Developer ergonomics | 35.7 |
+| Access clarity | 42.1 |
 
-- **Kin Lane** - kin@apievangelist.com
+**Agent readiness 2.5** — human-only
+
+| Agent-readiness dimension | Result |
+|---|---|
+| Spec Presence | — |
+| Agentic Access | — |
+| Reversibility Documented | — |
+| MCP Server | — |
+| Auth Clarity | — |
+| Idempotency | — |
+| Error Semantics | — |
+| OpenAPI Examples | — |
+| Rate Limit Signal | documented (partial credit) |
+| Event Surface Described | — |
+| Agent Skills | — |
+| Well Known Catalog | — |
+| Consent Identity | — |
+| Agent Card | — |
+| Dry Run Mode | — |
+| Delegated Identity | — |
+| Protected Resource Metadata | — |
+| Dynamic Client Registration | — |
+| Agentic Commerce | — |
+
+**Regulatory alignment 14.7** — Horizontal (data, software, accessibility, platform)
+
+The rubric is published at [github.com/api-evangelist/kin-score](https://github.com/api-evangelist/kin-score). The per-check breakdown behind these numbers — which checks were earned, partial or missed — along with score history and how this provider compares to its peers, is available at [apis.io/providers/goreplay/](https://apis.io/providers/goreplay/).
+
+## How this profile is made
+
+API Evangelist profiles a company's public API surface the way a developer would find it: the website, developer portal and documentation, the specifications it publishes, its public repositories, and its pricing, status and changelog pages. From that it derives the properties above — contracts split per API, workflows, schemas, collections, governance rules, plans and rate limits — and scores them against the published [Kin Score rubric](https://github.com/api-evangelist/kin-score).
+
+The artifacts are published on [APIs.io](https://apis.io), not in this repository. This repository is the public record for GoReplay: the place to say something is wrong, missing or out of date, and to ask for a re-score or a removal.
+
+## Open an issue
+
+- **Something about this listing** — a wrong description, a missing API, a stale artifact or a question about the rating: [open an issue on this repository](https://github.com/api-evangelist/goreplay/issues/new).
+- **A new API, or one that is not in the catalog yet** — [submit it on APIs.io](https://apis.io/add/).
+- **Anything else** — [the APIs.io inbox](https://github.com/api-search/inbox/issues/new) or [info@apievangelist.com](mailto:info@apievangelist.com).
